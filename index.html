@@ -938,7 +938,7 @@
     <div class="hero-right">
       <div class="hero-visual">
         <img 
-          src="hero.png" 
+          src="assets/hero.png" 
           alt="Cartas de tarot con cristales dorados"
           style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;"
         />
@@ -954,7 +954,7 @@
     <div class="sobre-visual reveal">
       <div class="sobre-frame" style="padding:0; overflow:hidden;">
         <img 
-          src="cande.png" 
+          src="assets/cande.png" 
           alt="Fotografía de Cande García"
           style="width:100%; height:100%; object-fit:cover; display:block;"
         />
@@ -1005,7 +1005,7 @@
       <!-- TAROT -->
       <div class="servicio-card reveal">
         <div class="servicio-img">
-          <img src="servicio_tarot.png" alt="Cartas de tarot" />
+          <img src="assets/servicio_tarot.png" alt="Cartas de tarot" />
         </div>
         <span class="servicio-icon">🃏</span>
         <h3 class="servicio-name">Consulta de Tarot</h3>
@@ -1029,7 +1029,7 @@
       <!-- REIKI -->
       <div class="servicio-card reveal">
         <div class="servicio-img">
-          <img src="servicio_reiki.png" alt="Sesión de Reiki" />
+          <img src="assets/servicio_reiki.png" alt="Sesión de Reiki" />
         </div>
         <span class="servicio-icon">✨</span>
         <h3 class="servicio-name">Sesión de Reiki</h3>
@@ -1050,7 +1050,7 @@
       <!-- METAFÍSICA -->
       <div class="servicio-card reveal">
         <div class="servicio-img">
-          <img src="servicio_metafisica.png" alt="Metafísica y cosmos" />
+          <img src="assets/servicio_metafisica.png" alt="Metafísica y cosmos" />
         </div>
         <span class="servicio-icon">🔮</span>
         <h3 class="servicio-name">Sesión de Metafísica</h3>
@@ -1206,26 +1206,26 @@
         <div class="form-row">
           <div class="form-group">
             <label for="nombre">Tu nombre</label>
-            <input type="text" id="nombre" placeholder="Ana García">
+            <input type="text" id="nombre" name="nombre" placeholder="Ana García">
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="ana@email.com">
+            <input type="email" id="email" name="email" placeholder="ana@email.com">
           </div>
         </div>
         <div class="form-group">
           <label for="servicio">Servicio de interés</label>
-          <select id="servicio">
+          <select id="servicio" name="servicio">
             <option value="">— Selecciona un servicio —</option>
             <option>Tarot — 30 minutos (45€)</option>
-            <option>Tarot — 60 minutos (80€)</option>
-            <option>Sesión de Reiki (65€)</option>
-            <option>Sesión de Metafísica (65€)</option>
+            <option>Tarot — 60 minutos (70€)</option>
+            <option>Sesión de Reiki (45€)</option>
+            <option>Sesión de Metafísica (60€)</option>
           </select>
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column;">
           <label for="mensaje">Tu mensaje</label>
-          <textarea id="mensaje" style="flex:1;" placeholder="Cuéntame brevemente qué te trae por aquí o qué horarios te vienen bien..."></textarea>
+          <textarea id="mensaje" name="mensaje" style="flex:1;" placeholder="Cuéntame brevemente qué te trae por aquí o qué horarios te vienen bien..."></textarea>
         </div>
         <button class="btn-submit" onclick="enviarFormulario()">Enviar mensaje ✦</button>
       </div>
@@ -1269,16 +1269,42 @@
       el.style.transitionDelay = (i * 0.12) + 's';
     });
 
-    // Form
-    function enviarFormulario() {
+    // Form — Formspree
+    async function enviarFormulario() {
       const nombre = document.getElementById('nombre').value.trim();
       const email = document.getElementById('email').value.trim();
+      const servicio = document.getElementById('servicio').value;
+      const mensaje = document.getElementById('mensaje').value.trim();
+
       if (!nombre || !email) {
         alert('Por favor, rellena al menos tu nombre y email.');
         return;
       }
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+
+      const btn = document.querySelector('.btn-submit');
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('https://formspree.io/f/mjgdbeno', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ nombre, email, servicio, mensaje })
+        });
+
+        if (res.ok) {
+          document.getElementById('form-container').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          alert('Hubo un problema al enviar. Por favor inténtalo de nuevo o escríbeme directamente.');
+          btn.textContent = 'Enviar mensaje ✦';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Error de conexión. Por favor inténtalo de nuevo.');
+        btn.textContent = 'Enviar mensaje ✦';
+        btn.disabled = false;
+      }
     }
 
     // Testimonios carousel
