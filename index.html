@@ -924,7 +924,7 @@
     <div class="hero-left">
       <p class="hero-eyebrow fade-up">Tarot ◆ Reiki ◆ Metafísica ◆</p>
       <h1 class="hero-title fade-up">
-        Cande <em>García M</em>
+        Cande <em>García</em>
       </h1>
       <p class="hero-slogan fade-up">"Simplemente confía."</p>
       <p class="hero-desc fade-up">
@@ -1206,26 +1206,26 @@
         <div class="form-row">
           <div class="form-group">
             <label for="nombre">Tu nombre</label>
-            <input type="text" id="nombre" placeholder="Ana García">
+            <input type="text" id="nombre" name="nombre" placeholder="Ana García">
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" placeholder="ana@email.com">
+            <input type="email" id="email" name="email" placeholder="ana@email.com">
           </div>
         </div>
         <div class="form-group">
           <label for="servicio">Servicio de interés</label>
-          <select id="servicio">
+          <select id="servicio" name="servicio">
             <option value="">— Selecciona un servicio —</option>
             <option>Tarot — 30 minutos (45€)</option>
-            <option>Tarot — 60 minutos (80€)</option>
-            <option>Sesión de Reiki (65€)</option>
-            <option>Sesión de Metafísica (65€)</option>
+            <option>Tarot — 60 minutos (70€)</option>
+            <option>Sesión de Reiki (45€)</option>
+            <option>Sesión de Metafísica (60€)</option>
           </select>
         </div>
         <div class="form-group" style="flex:1; display:flex; flex-direction:column;">
           <label for="mensaje">Tu mensaje</label>
-          <textarea id="mensaje" style="flex:1;" placeholder="Cuéntame brevemente qué te trae por aquí o qué horarios te vienen bien..."></textarea>
+          <textarea id="mensaje" name="mensaje" style="flex:1;" placeholder="Cuéntame brevemente qué te trae por aquí o qué horarios te vienen bien..."></textarea>
         </div>
         <button class="btn-submit" onclick="enviarFormulario()">Enviar mensaje ✦</button>
       </div>
@@ -1269,16 +1269,42 @@
       el.style.transitionDelay = (i * 0.12) + 's';
     });
 
-    // Form
-    function enviarFormulario() {
+    // Form — Formspree
+    async function enviarFormulario() {
       const nombre = document.getElementById('nombre').value.trim();
       const email = document.getElementById('email').value.trim();
+      const servicio = document.getElementById('servicio').value;
+      const mensaje = document.getElementById('mensaje').value.trim();
+
       if (!nombre || !email) {
         alert('Por favor, rellena al menos tu nombre y email.');
         return;
       }
-      document.getElementById('form-container').style.display = 'none';
-      document.getElementById('form-success').style.display = 'block';
+
+      const btn = document.querySelector('.btn-submit');
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('https://formspree.io/f/mjgdbeno', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ nombre, email, servicio, mensaje })
+        });
+
+        if (res.ok) {
+          document.getElementById('form-container').style.display = 'none';
+          document.getElementById('form-success').style.display = 'block';
+        } else {
+          alert('Hubo un problema al enviar. Por favor inténtalo de nuevo o escríbeme directamente.');
+          btn.textContent = 'Enviar mensaje ✦';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Error de conexión. Por favor inténtalo de nuevo.');
+        btn.textContent = 'Enviar mensaje ✦';
+        btn.disabled = false;
+      }
     }
 
     // Testimonios carousel
